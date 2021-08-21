@@ -5,7 +5,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const getByScriptCode = `-- name: GetByScriptCode :many
@@ -15,7 +14,7 @@ WHERE script_code = $1
 AND status = 1
 `
 
-func (q *Queries) GetByScriptCode(ctx context.Context, scriptCode sql.NullString) ([]QuickReply, error) {
+func (q *Queries) GetByScriptCode(ctx context.Context, scriptCode string) ([]QuickReply, error) {
 	rows, err := q.db.QueryContext(ctx, getByScriptCode, scriptCode)
 	if err != nil {
 		return nil, err

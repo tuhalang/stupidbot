@@ -7,9 +7,23 @@ import (
 	"time"
 )
 
+type Question struct {
+	ID            sql.NullInt64  `json:"id"`
+	TopicCode     sql.NullInt64  `json:"topic_code"`
+	ContentText   sql.NullString `json:"content_text"`
+	ContentImage  sql.NullString `json:"content_image"`
+	CorrectAnswer sql.NullString `json:"correct_answer"`
+	// 1 - de
+	// 2 - trung binh
+	// 3 - kho
+	// 4 - rat kho
+	Difficult   sql.NullInt32  `json:"difficult"`
+	SubjectCode sql.NullString `json:"subject_code"`
+}
+
 type QuickReply struct {
 	ID          int64          `json:"id"`
-	ScriptCode  sql.NullString `json:"script_code"`
+	ScriptCode  string         `json:"script_code"`
 	ContentType sql.NullString `json:"content_type"`
 	Title       sql.NullString `json:"title"`
 	Payload     sql.NullString `json:"payload"`
@@ -20,14 +34,30 @@ type QuickReply struct {
 
 type Script struct {
 	Code            string         `json:"code"`
-	ActionProcessor sql.NullString `json:"action_processor"`
-	ActionRetriever sql.NullString `json:"action_retriever"`
+	ActionProcessor string         `json:"action_processor"`
 	MessageFailed   sql.NullString `json:"message_failed"`
 	MessageImage    sql.NullString `json:"message_image"`
 	MessageSucceed  sql.NullString `json:"message_succeed"`
 	MessageText     sql.NullString `json:"message_text"`
 	OrderNumber     sql.NullInt32  `json:"order_number"`
 	ParentCode      sql.NullString `json:"parent_code"`
+}
+
+type SessionContext struct {
+	ID         sql.NullInt64 `json:"id"`
+	UserID     string        `json:"user_id"`
+	ScriptCode string        `json:"script_code"`
+	ValidTime  time.Time     `json:"valid_time"`
+}
+
+type Topic struct {
+	TopicName    sql.NullString `json:"topic_name"`
+	Description  sql.NullString `json:"description"`
+	DocumentLink sql.NullString `json:"document_link"`
+	SubjectCode  string         `json:"subject_code"`
+	Image        sql.NullString `json:"image"`
+	OrderNumber  sql.NullInt32  `json:"order_number"`
+	TopicCode    string         `json:"topic_code"`
 }
 
 type User struct {

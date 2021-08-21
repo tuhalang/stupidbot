@@ -5,7 +5,9 @@ import (
 	"log"
 
 	_ "github.com/lib/pq"
+	"github.com/tuhalang/stupidbot/internal/app/api"
 	db "github.com/tuhalang/stupidbot/internal/app/db/sqlc"
+	"github.com/tuhalang/stupidbot/internal/app/service"
 	"github.com/tuhalang/stupidbot/internal/app/util"
 )
 
@@ -22,7 +24,10 @@ func main() {
 	}
 
 	store := db.NewStore(conn)
-	server, err := api.NewServer(config, *store)
+
+	eventService := service.NewEventService(config, store)
+
+	server, err := api.NewServer(eventService)
 	if err != nil {
 		log.Fatal("cannot create server:", err)
 	}

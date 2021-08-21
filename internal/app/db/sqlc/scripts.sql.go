@@ -9,10 +9,9 @@ import (
 )
 
 const getScriptByCode = `-- name: GetScriptByCode :one
-SELECT  code, action_processor, action_retriever, message_failed, message_image, message_succeed, message_text, order_number, parent_code
+SELECT  code, action_processor, message_failed, message_image, message_succeed, message_text, order_number, parent_code
 FROM scripts
 WHERE code = $1
-and status = 1
 LIMIT 1
 `
 
@@ -22,7 +21,6 @@ func (q *Queries) GetScriptByCode(ctx context.Context, code string) (Script, err
 	err := row.Scan(
 		&i.Code,
 		&i.ActionProcessor,
-		&i.ActionRetriever,
 		&i.MessageFailed,
 		&i.MessageImage,
 		&i.MessageSucceed,
@@ -34,10 +32,9 @@ func (q *Queries) GetScriptByCode(ctx context.Context, code string) (Script, err
 }
 
 const getScriptByParent = `-- name: GetScriptByParent :many
-SELECT code, action_processor, action_retriever, message_failed, message_image, message_succeed, message_text, order_number, parent_code
+SELECT code, action_processor, message_failed, message_image, message_succeed, message_text, order_number, parent_code
 FROM scripts
 WHERE parent_code = $1
-and status = 1
 `
 
 func (q *Queries) GetScriptByParent(ctx context.Context, parentCode sql.NullString) ([]Script, error) {
@@ -52,7 +49,6 @@ func (q *Queries) GetScriptByParent(ctx context.Context, parentCode sql.NullStri
 		if err := rows.Scan(
 			&i.Code,
 			&i.ActionProcessor,
-			&i.ActionRetriever,
 			&i.MessageFailed,
 			&i.MessageImage,
 			&i.MessageSucceed,

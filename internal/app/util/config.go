@@ -10,7 +10,21 @@ type Config struct {
 	ServerAddress   string `mapstructure:"SERVER_ADDRESS"`
 	PageAccessToken string `mapstructure:"PAGE_ACCESS_TOKEN"`
 	VerifyToken     string `mapstructure:"VERIFY_TOKEN"`
+	FacebookApi     string `mapstructure:"FACEBOOK_API"`
 }
+
+const (
+	DefaultScript = "HELP"
+	UnknownScript = "UNKNOWN"
+
+	DefaultSubject = "VAT_LY"
+
+	MessageText     = "TEXT"
+	MessagePostback = "POSTBACK"
+
+	ProcessGuideAction    = "ProcessGuideAction"
+	ProcessPracticeAction = "ProcessPracticeAction"
+)
 
 func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)
