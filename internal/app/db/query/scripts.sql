@@ -7,4 +7,5 @@ LIMIT 1;
 -- name: GetScriptByParent :many
 SELECT *
 FROM scripts
-WHERE parent_code = $1;
+WHERE parent_code = $1
+order by order_number;

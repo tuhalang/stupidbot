@@ -5,23 +5,78 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
+const getQuestionById = `-- name: GetQuestionById :one
+SELECT id, topic_code, content_text, content_image, correct_answer, difficult, subject_code, status
+FROM question
+WHERE id = $1
+and status = 1
+LIMIT 1
+`
+
+func (q *Queries) GetQuestionById(ctx context.Context, id int64) (Question, error) {
+	row := q.db.QueryRowContext(ctx, getQuestionById, id)
+	var i Question
+	err := row.Scan(
+		&i.ID,
+		&i.TopicCode,
+		&i.ContentText,
+		&i.ContentImage,
+		&i.CorrectAnswer,
+		&i.Difficult,
+		&i.SubjectCode,
+		&i.Status,
+	)
+	return i, err
+}
+
+const getRandomQuestion = `-- name: GetRandomQuestion :one
+SELECT id, topic_code, content_text, content_image, correct_answer, difficult, subject_code, status
+FROM question
+WHERE topic_code = $1 
+AND subject_code = $2
+and status = 1
+ORDER BY random()
+LIMIT 1
+`
+
+type GetRandomQuestionParams struct {
+	TopicCode   string `json:"topic_code"`
+	SubjectCode string `json:"subject_code"`
+}
+
+func (q *Queries) GetRandomQuestion(ctx context.Context, arg GetRandomQuestionParams) (Question, error) {
+	row := q.db.QueryRowContext(ctx, getRandomQuestion, arg.TopicCode, arg.SubjectCode)
+	var i Question
+	err := row.Scan(
+		&i.ID,
+		&i.TopicCode,
+		&i.ContentText,
+		&i.ContentImage,
+		&i.CorrectAnswer,
+		&i.Difficult,
+		&i.SubjectCode,
+		&i.Status,
+	)
+	return i, err
+}
+
 const listQuestion = `-- name: ListQuestion :many
-SELECT id, topic_code, content_text, content_image, correct_answer, difficult, subject_code
+SELECT id, topic_code, content_text, content_image, correct_answer, difficult, subject_code, status
 FROM question
 WHERE topic_code = $1
 and subject_code = $2
+and status = 1
 ORDER BY difficult
 LIMIT $3 OFFSET $4
 `
 
 type ListQuestionParams struct {
-	TopicCode   sql.NullInt64  `json:"topic_code"`
-	SubjectCode sql.NullString `json:"subject_code"`
-	Limit       int32          `json:"limit"`
-	Offset      int32          `json:"offset"`
+	TopicCode   string `json:"topic_code"`
+	SubjectCode string `json:"subject_code"`
+	Limit       int32  `json:"limit"`
+	Offset      int32  `json:"offset"`
 }
 
 func (q *Queries) ListQuestion(ctx context.Context, arg ListQuestionParams) ([]Question, error) {
@@ -46,6 +101,7 @@ func (q *Queries) ListQuestion(ctx context.Context, arg ListQuestionParams) ([]Q
 			&i.CorrectAnswer,
 			&i.Difficult,
 			&i.SubjectCode,
+			&i.Status,
 		); err != nil {
 			return nil, err
 		}

@@ -12,6 +12,7 @@ SELECT id, script_code, content_type, title, payload, image_url, status, order_n
 FROM quick_reply
 WHERE script_code = $1
 AND status = 1
+order by order_number
 `
 
 func (q *Queries) GetByScriptCode(ctx context.Context, scriptCode string) ([]QuickReply, error) {

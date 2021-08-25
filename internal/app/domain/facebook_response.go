@@ -42,14 +42,16 @@ type DefaultAction struct {
 
 // Attachment The attachment to send (custom)
 type Attachment struct {
-	Attachment struct {
-		Type    string `json:"type,omitempty"`
-		Payload struct {
-			TemplateType string    `json:"template_type,omitempty"`
-			Elements     []Element `json:"elements,omitempty"`
-			URL          string    `json:"url,omitempty"`
-		} `json:"payload,omitempty"`
-	} `json:"attachment,omitempty"`
+	Attachment ContentAttachment `json:"attachment,omitempty"`
+}
+
+type ContentAttachment struct {
+	Type    string `json:"type,omitempty"`
+	Payload struct {
+		TemplateType string    `json:"template_type,omitempty"`
+		Elements     []Element `json:"elements,omitempty"`
+		URL          string    `json:"url,omitempty"`
+	} `json:"payload,omitempty"`
 }
 
 // ResponseAttachment Full response

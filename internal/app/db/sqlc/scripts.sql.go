@@ -35,6 +35,7 @@ const getScriptByParent = `-- name: GetScriptByParent :many
 SELECT code, action_processor, message_failed, message_image, message_succeed, message_text, order_number, parent_code
 FROM scripts
 WHERE parent_code = $1
+order by order_number
 `
 
 func (q *Queries) GetScriptByParent(ctx context.Context, parentCode sql.NullString) ([]Script, error) {

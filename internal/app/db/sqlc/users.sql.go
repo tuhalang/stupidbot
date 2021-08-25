@@ -9,25 +9,19 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (id, user_name, email, status)
-VALUES ($1, $2, $3, $4)
+INSERT INTO users (id, is_mentor, status)
+VALUES ($1, $2, $3)
 RETURNING id, phone, email, created_at, status, full_name, is_mentor, user_name
 `
 
 type CreateUserParams struct {
-	ID       string         `json:"id"`
-	UserName sql.NullString `json:"user_name"`
-	Email    sql.NullString `json:"email"`
-	Status   int32          `json:"status"`
+	ID       string        `json:"id"`
+	IsMentor sql.NullInt32 `json:"is_mentor"`
+	Status   int32         `json:"status"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser,
-		arg.ID,
-		arg.UserName,
-		arg.Email,
-		arg.Status,
-	)
+	row := q.db.QueryRowContext(ctx, createUser, arg.ID, arg.IsMentor, arg.Status)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -50,6 +44,31 @@ WHERE id = $1
 func (q *Queries) DeleteUser(ctx context.Context, id string) error {
 	_, err := q.db.ExecContext(ctx, deleteUser, id)
 	return err
+}
+
+const getMentorAvailable = `-- name: GetMentorAvailable :one
+SELECT id, phone, email, created_at, status, full_name, is_mentor, user_name
+FROM users u
+WHERE u.is_mentor = 1
+AND u.status = 1
+AND not exists (SELECT 1 FROM conversation c WHERE c.mentor_id = u.id and c.status = 1 and c.valid_time > now())
+LIMIT 1
+`
+
+func (q *Queries) GetMentorAvailable(ctx context.Context) (User, error) {
+	row := q.db.QueryRowContext(ctx, getMentorAvailable)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Phone,
+		&i.Email,
+		&i.CreatedAt,
+		&i.Status,
+		&i.FullName,
+		&i.IsMentor,
+		&i.UserName,
+	)
+	return i, err
 }
 
 const getUser = `-- name: GetUser :one

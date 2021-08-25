@@ -10,17 +10,32 @@ import (
 
 func (eventService *EventService) handleProcess(senderId, text, postback, messageType string, script db.Script, fn func([]byte) error) error {
 
-	var data []byte
+	var datas [][]byte
+	var err error
 
 	if util.MessagePostback == messageType {
 		switch script.ActionProcessor {
 		case util.ProcessPracticeAction:
-			data, _ = handler.ProcessPracticeAction(eventService.store, script, senderId, text, postback)
+			datas, _ = handler.ProcessPracticeAction(eventService.store, script, senderId, text, postback)
+		case util.ProcessGuideAction:
+			datas, _ = handler.ProcessGuideAction(eventService.store, script, senderId)
+		case util.ProcessIntroAction:
+			datas, _ = handler.ProcessIntroAction(eventService.store, script, senderId)
+		case util.ProcessContributeAction:
+			datas, _ = handler.ProcessContributeAction(eventService.store, script, senderId)
+		case util.ProcessDonateAction:
+			datas, _ = handler.ProcessDonateAction(eventService.store, script, senderId)
+		case util.ProcessNextQuestionAction:
+			datas, _ = handler.ProcessNextQuestionAction(eventService.store, script, senderId, text, postback)
+		case util.ProcessRegisterMentorAction:
+			datas, _ = handler.ProcessRegisterMentorAction(eventService.store, script, senderId)
+		case util.ProcessAskMentorAction:
+			datas, _ = handler.ProcessAskMentorAction(eventService.store, script, senderId, text, postback)
 		}
 	} else if util.MessageText == messageType {
 		switch script.ActionProcessor {
 		case util.ProcessGuideAction:
-			data, _ = handler.ProcessGuideAction(eventService.store, script, senderId)
+			datas, _ = handler.ProcessGuideAction(eventService.store, script, senderId)
 		}
 	}
 
@@ -29,5 +44,9 @@ func (eventService *EventService) handleProcess(senderId, text, postback, messag
 		ScriptCode: script.Code,
 	})
 
-	return fn(data)
+	for _, data := range datas {
+		err = fn(data)
+	}
+
+	return err
 }

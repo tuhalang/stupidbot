@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -14,6 +15,8 @@ import (
 )
 
 func (eventService *EventService) HandleMessage(inputMessage domain.InputMessage) error {
+
+	log.Print("EventMessage", inputMessage)
 
 	for _, entry := range inputMessage.Entry {
 		if len(entry.Messaging) == 0 {
@@ -40,11 +43,66 @@ func (eventService *EventService) HandleMessage(inputMessage domain.InputMessage
 				log.Print(err)
 				return err
 			}
+		} else if len(event.Message.Attachments) > 0 {
+			if err := eventService.handleMedia(event.Sender.ID, event.Message.Attachments); err != nil {
+				log.Print(err)
+				return err
+			}
 		}
 
 	}
 
 	return nil
+}
+
+func (eventService *EventService) handleMedia(senderId string, attachments []domain.ContentAttachment) error {
+	conversation, err := eventService.store.GetConversationByUser(context.Background(), senderId)
+	if err == nil {
+		for _, attachment := range attachments {
+
+			response := domain.ResponseAttachment{
+				Recipient: domain.Recipient{
+					ID: conversation.MentorID,
+				},
+				Message: domain.Attachment{
+					Attachment: attachment,
+				},
+			}
+
+			data, err := json.Marshal(response)
+			if err != nil {
+				log.Printf("Marshal error: %s", err)
+				return err
+			}
+			eventService.sendRequest(data)
+		}
+		return nil
+	}
+
+	conversation, err = eventService.store.GetConversationByMentor(context.Background(), senderId)
+	if err == nil {
+		for _, attachment := range attachments {
+			response := domain.ResponseAttachment{
+				Recipient: domain.Recipient{
+					ID: conversation.UserID,
+				},
+				Message: domain.Attachment{
+					Attachment: attachment,
+				},
+			}
+
+			data, err := json.Marshal(response)
+			if err != nil {
+				log.Printf("Marshal error: %s", err)
+				return err
+			}
+			eventService.sendRequest(data)
+		}
+		return nil
+	}
+
+	script, _ := eventService.store.GetScriptByCode(context.Background(), util.DefaultScript)
+	return eventService.handleProcess(senderId, "", "", util.MessageText, script, eventService.sendRequest)
 }
 
 // Dinh dang tin nhan postback: COMMAND|param...
@@ -63,6 +121,64 @@ func (eventService *EventService) handlePostback(senderId, title, postback strin
 
 func (eventService *EventService) handleText(senderId string, text string) error {
 	log.Print("message text from client: " + text)
+
+	conversation, err := eventService.store.GetConversationByUser(context.Background(), senderId)
+	if err == nil {
+		if text == util.ExitComman {
+			err := eventService.store.InvalidConversation(context.Background(), conversation.ID)
+			if err != nil {
+				log.Print(err)
+				return err
+			}
+		} else {
+			response := domain.ResponseMessage{
+				Recipient: domain.Recipient{
+					ID: conversation.MentorID,
+				},
+				MessagingType: "RESPONSE",
+				Message: domain.Message{
+					Text: text,
+				},
+			}
+
+			data, err := json.Marshal(response)
+			if err != nil {
+				log.Printf("Marshal error: %s", err)
+				return err
+			}
+			eventService.sendRequest(data)
+			return nil
+		}
+	}
+
+	conversation, err = eventService.store.GetConversationByMentor(context.Background(), senderId)
+	if err == nil {
+		if text == util.ExitComman {
+			err := eventService.store.InvalidConversation(context.Background(), conversation.ID)
+			if err != nil {
+				log.Print(err)
+				return err
+			}
+		} else {
+			response := domain.ResponseMessage{
+				Recipient: domain.Recipient{
+					ID: conversation.UserID,
+				},
+				MessagingType: "RESPONSE",
+				Message: domain.Message{
+					Text: text,
+				},
+			}
+
+			data, err := json.Marshal(response)
+			if err != nil {
+				log.Printf("Marshal error: %s", err)
+				return err
+			}
+			eventService.sendRequest(data)
+			return nil
+		}
+	}
 
 	script, err := eventService.store.GetScriptByCode(context.Background(), strings.ToUpper(text))
 	if err != nil {

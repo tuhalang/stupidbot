@@ -8,9 +8,10 @@ import (
 )
 
 const listTopics = `-- name: ListTopics :many
-SELECT topic_name, description, document_link, subject_code, image, order_number, topic_code
+SELECT topic_name, description, document_link, subject_code, image, order_number, status, topic_code
 FROM topic
 WHERE subject_code = $1
+and status = 1
 ORDER BY order_number
 `
 
@@ -30,6 +31,7 @@ func (q *Queries) ListTopics(ctx context.Context, subjectCode string) ([]Topic, 
 			&i.SubjectCode,
 			&i.Image,
 			&i.OrderNumber,
+			&i.Status,
 			&i.TopicCode,
 		); err != nil {
 			return nil, err

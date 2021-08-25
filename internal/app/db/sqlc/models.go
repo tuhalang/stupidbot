@@ -7,26 +7,35 @@ import (
 	"time"
 )
 
+type Conversation struct {
+	ID        int64     `json:"id"`
+	UserID    string    `json:"user_id"`
+	MentorID  string    `json:"mentor_id"`
+	ValidTime time.Time `json:"valid_time"`
+	Status    int32     `json:"status"`
+}
+
 type Question struct {
-	ID            sql.NullInt64  `json:"id"`
-	TopicCode     sql.NullInt64  `json:"topic_code"`
-	ContentText   sql.NullString `json:"content_text"`
-	ContentImage  sql.NullString `json:"content_image"`
-	CorrectAnswer sql.NullString `json:"correct_answer"`
+	ID            int64  `json:"id"`
+	TopicCode     string `json:"topic_code"`
+	ContentText   string `json:"content_text"`
+	ContentImage  string `json:"content_image"`
+	CorrectAnswer string `json:"correct_answer"`
 	// 1 - de
 	// 2 - trung binh
 	// 3 - kho
 	// 4 - rat kho
-	Difficult   sql.NullInt32  `json:"difficult"`
-	SubjectCode sql.NullString `json:"subject_code"`
+	Difficult   int32  `json:"difficult"`
+	SubjectCode string `json:"subject_code"`
+	Status      int32  `json:"status"`
 }
 
 type QuickReply struct {
 	ID          int64          `json:"id"`
 	ScriptCode  string         `json:"script_code"`
-	ContentType sql.NullString `json:"content_type"`
-	Title       sql.NullString `json:"title"`
-	Payload     sql.NullString `json:"payload"`
+	ContentType string         `json:"content_type"`
+	Title       string         `json:"title"`
+	Payload     string         `json:"payload"`
 	ImageUrl    sql.NullString `json:"image_url"`
 	Status      int32          `json:"status"`
 	OrderNumber sql.NullInt32  `json:"order_number"`
@@ -50,6 +59,14 @@ type SessionContext struct {
 	ValidTime  time.Time     `json:"valid_time"`
 }
 
+type Subject struct {
+	SubjectCode string         `json:"subject_code"`
+	SubjectName string         `json:"subject_name"`
+	Status      int32          `json:"status"`
+	OrderNumber int32          `json:"order_number"`
+	Image       sql.NullString `json:"image"`
+}
+
 type Topic struct {
 	TopicName    sql.NullString `json:"topic_name"`
 	Description  sql.NullString `json:"description"`
@@ -57,6 +74,7 @@ type Topic struct {
 	SubjectCode  string         `json:"subject_code"`
 	Image        sql.NullString `json:"image"`
 	OrderNumber  sql.NullInt32  `json:"order_number"`
+	Status       int32          `json:"status"`
 	TopicCode    string         `json:"topic_code"`
 }
 
@@ -67,6 +85,6 @@ type User struct {
 	CreatedAt time.Time      `json:"created_at"`
 	Status    int32          `json:"status"`
 	FullName  sql.NullString `json:"full_name"`
-	IsMentor  sql.NullString `json:"is_mentor"`
+	IsMentor  sql.NullInt32  `json:"is_mentor"`
 	UserName  sql.NullString `json:"user_name"`
 }

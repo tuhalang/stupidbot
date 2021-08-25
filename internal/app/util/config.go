@@ -14,16 +14,26 @@ type Config struct {
 }
 
 const (
-	DefaultScript = "HELP"
-	UnknownScript = "UNKNOWN"
+	DefaultScript      = "HELP"
+	UnknownScript      = "UNKNOWN"
+	OptionsScript      = "OPTIONS"
+	ExtraOptionsScript = "EXTRA_OPTIONS"
+
+	ExitComman = "q"
 
 	DefaultSubject = "VAT_LY"
 
 	MessageText     = "TEXT"
 	MessagePostback = "POSTBACK"
 
-	ProcessGuideAction    = "ProcessGuideAction"
-	ProcessPracticeAction = "ProcessPracticeAction"
+	ProcessGuideAction          = "ProcessGuideAction"
+	ProcessPracticeAction       = "ProcessPracticeAction"
+	ProcessIntroAction          = "ProcessIntroAction"
+	ProcessContributeAction     = "ProcessContributeAction"
+	ProcessDonateAction         = "ProcessDonateAction"
+	ProcessNextQuestionAction   = "ProcessNextQuestionAction"
+	ProcessRegisterMentorAction = "ProcessRegisterMentorAction"
+	ProcessAskMentorAction      = "ProcessAskMentorAction"
 )
 
 func LoadConfig(path string) (config Config, err error) {

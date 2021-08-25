@@ -1,15 +1,17 @@
-FROM golang:1.16-alpine
+FROM golang 
 
-WORKDIR /app
+ENV GO111MODULE on
 
-COPY go.mod ./
-COPY go.sum ./
+RUN go version
+
+COPY . /src
+
+WORKDIR /src
+
 RUN go mod download
 
-COPY * ./
-
-RUN go build -o /stupidbot
+RUN go build -o app
 
 EXPOSE 8080
 
-CMD [ "./stupidbot" ]
+ENTRYPOINT [ "./app" ]

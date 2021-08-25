@@ -1,7 +1,15 @@
 -- name: CreateUser :one
-INSERT INTO users (id, user_name, email, status)
-VALUES ($1, $2, $3, $4)
+INSERT INTO users (id, is_mentor, status)
+VALUES ($1, $2, $3)
 RETURNING *;
+
+-- name: GetMentorAvailable :one
+SELECT *
+FROM users u
+WHERE u.is_mentor = 1
+AND u.status = 1
+AND not exists (SELECT 1 FROM conversation c WHERE c.mentor_id = u.id and c.status = 1 and c.valid_time > now())
+LIMIT 1;
 
 -- name: GetUser :one
 SELECT *

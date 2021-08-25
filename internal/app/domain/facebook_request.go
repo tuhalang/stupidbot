@@ -19,9 +19,10 @@ type InputMessage struct {
 			} `json:"recipient"`
 			Timestamp int64 `json:"timestamp"`
 			Message   struct {
-				Mid  string `json:"mid"`
-				Text string `json:"text"`
-				Nlp  struct {
+				Mid         string              `json:"mid"`
+				Text        string              `json:"text"`
+				Attachments []ContentAttachment `json:"attachments"`
+				Nlp         struct {
 					Entities struct {
 						Sentiment []struct {
 							Confidence float64 `json:"confidence"`

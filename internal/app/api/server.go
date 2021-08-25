@@ -24,24 +24,6 @@ func NewServer(eventService *service.EventService) (*Server, error) {
 	return server, nil
 }
 
-// func NewServerSSL(eventService *service.EventService) {
-
-// 	x509, errTls := tls.LoadX509KeyPair(os.Getenv("SSLCRT"), os.Getenv("SSLKEY"))
-// 	if errTls != nil {
-// 		fmt.Println(errTls)
-// 	}
-// 	fmt.Println(os.Getenv("SSLCRT"), "SSLKEY")
-// 	var server *http.Server
-// 	server = &http.Server{
-// 		Addr:    eventService.Config.ServerAddress,
-// 		Handler: r,
-// 		TLSConfig: &tls.Config{
-// 			Certificates: []tls.Certificate{x509},
-// 		},
-// 	}
-// 	server.ListenAndServeTLS("", "")
-// }
-
 func (server *Server) setupRouter() {
 	router := gin.Default()
 
@@ -58,7 +40,7 @@ func (server *Server) setupRouter() {
 
 // Start runs the HTTP server on a specific address.
 func (server *Server) Start(address string) error {
-	return server.router.Run(address)
+	return server.router.Run()
 }
 
 func errorResponse(err error) gin.H {
